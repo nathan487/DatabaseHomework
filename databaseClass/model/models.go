@@ -97,6 +97,7 @@ type LoginResponse struct {
 	UserID   int    `json:"user_id"`
 	Username string `json:"username"`
 	RoleName string `json:"role_name"`
+	RoleID   int    `json:"role_id"`
 }
 
 type CreateActivityRequest struct {

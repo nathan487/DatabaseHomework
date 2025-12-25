@@ -400,9 +400,13 @@
                 <div class="form-group">
                     <label>用户类型</label>
                     <div class="role-group">
-                        <label class="role-option">
-                            <input type="radio" name="role" value="1" checked>
+                        <label class="role-option" style="margin-right: 16px;">
+                            <input type="radio" name="role" value="普通用户" checked>
                             普通用户
+                        </label>
+                        <label class="role-option">
+                            <input type="radio" name="role" value="管理员">
+                            管理员
                         </label>
                     </div>
                 </div>
@@ -512,13 +516,15 @@
 
             setButtonLoading(btn, true);
 
+            const roleName = document.querySelector('input[name="role"]:checked')?.value || '普通用户';
+
             fetch(`${API_BASE}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     username, 
                     password,
-                    role_id: 1
+                    role_name: roleName
                 })
             })
                 .then(res => res.json())

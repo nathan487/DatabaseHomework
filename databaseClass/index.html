@@ -585,6 +585,18 @@
                 </div>
             </div>
 
+            <!-- Available Activities (NOT IN集合操作) -->
+            <div style="margin-bottom: 32px;">
+                <div class="section-title">✅ 我可以申请的活动</div>
+                <div id="availableActivitiesContainer" style="display: grid; gap: 16px;"></div>
+            </div>
+
+            <!-- Upcoming Activities (日期函数) -->
+            <div style="margin-bottom: 32px;">
+                <div class="section-title">⏰ 即将开始的活动（3天内）</div>
+                <div id="upcomingActivitiesContainer" style="display: grid; gap: 16px;"></div>
+            </div>
+
             <!-- Activities -->
             <div class="content-grid" id="activitiesContainer"></div>
         </div>
@@ -777,45 +789,89 @@
 
     <!-- Statistics Modal -->
     <div id="statisticsModal" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-content" style="max-width: 1000px; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
                 <div class="modal-title">系统统计仪表盘</div>
                 <button class="modal-close" onclick="closeStatisticsModal()">×</button>
             </div>
             <div class="modal-body">
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
-                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
-                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">总活动数</div>
-                        <div style="font-size: 28px; font-weight: 700; color: var(--primary-color);" id="statTotalActivities">0</div>
+                <!-- 基础统计 -->
+                <h3 style="margin-bottom: 16px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px;">📊 基础统计</h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px;">
+                    <div style="padding: 12px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">总活动数</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);" id="statTotalActivities">0</div>
                     </div>
-                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
-                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">活跃活动</div>
-                        <div style="font-size: 28px; font-weight: 700; color: var(--success-color);" id="statActiveActivities">0</div>
+                    <div style="padding: 12px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">活跃活动</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--success-color);" id="statActiveActivities">0</div>
                     </div>
-                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
-                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">总用户数</div>
-                        <div style="font-size: 28px; font-weight: 700; color: var(--info-color);" id="statTotalUsers">0</div>
+                    <div style="padding: 12px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">总用户数</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--info-color);" id="statTotalUsers">0</div>
                     </div>
-                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
-                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">总报名数</div>
-                        <div style="font-size: 28px; font-weight: 700; color: var(--warning-color);" id="statTotalApplications">0</div>
+                    <div style="padding: 12px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">总报名数</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--warning-color);" id="statTotalApplications">0</div>
                     </div>
-                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
-                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">已批准</div>
-                        <div style="font-size: 28px; font-weight: 700; color: #10b981;" id="statApprovedApplications">0</div>
+                    <div style="padding: 12px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">已批准</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #10b981;" id="statApprovedApplications">0</div>
                     </div>
-                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
-                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">待审批</div>
-                        <div style="font-size: 28px; font-weight: 700; color: #f59e0b;" id="statPendingApplications">0</div>
+                    <div style="padding: 12px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">待审批</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #f59e0b;" id="statPendingApplications">0</div>
                     </div>
-                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
-                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">已拒绝</div>
-                        <div style="font-size: 28px; font-weight: 700; color: var(--danger-color);" id="statRejectedApplications">0</div>
+                    <div style="padding: 12px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">已拒绝</div>
+                        <div style="font-size: 24px; font-weight: 700; color: var(--danger-color);" id="statRejectedApplications">0</div>
                     </div>
-                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
-                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">已过期活动</div>
-                        <div style="font-size: 28px; font-weight: 700; color: #6b7280;" id="statExpiredActivities">0</div>
+                    <div style="padding: 12px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 4px;">已过期活动</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #6b7280;" id="statExpiredActivities">0</div>
                     </div>
+                </div>
+
+                <!-- 部门统计 -->
+                <h3 style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px;">🏢 部门统计</h3>
+                <div id="deptStatsContainer" style="margin-bottom: 24px;">
+                    <div style="text-align: center; color: var(--gray-600);">加载中...</div>
+                </div>
+
+                <!-- 分类统计 -->
+                <h3 style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px;">📂 分类统计</h3>
+                <div id="categoryStatsContainer" style="margin-bottom: 24px;">
+                    <div style="text-align: center; color: var(--gray-600);">加载中...</div>
+                </div>
+
+                <!-- 活动热度排行 -->
+                <h3 style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px;">🔥 活动热度排行</h3>
+                <div id="popularityContainer" style="margin-bottom: 24px;">
+                    <div style="text-align: center; color: var(--gray-600);">加载中...</div>
+                </div>
+
+                <!-- 用户活跃度 -->
+                <h3 style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px;">⭐ 用户活跃度排行</h3>
+                <div id="userActivityContainer" style="margin-bottom: 24px;">
+                    <div style="text-align: center; color: var(--gray-600);">加载中...</div>
+                </div>
+
+                <!-- 管理员创建统计 -->
+                <h3 style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px;">👨‍💼 管理员创建统计</h3>
+                <div id="adminStatsContainer" style="margin-bottom: 24px;">
+                    <div style="text-align: center; color: var(--gray-600);">加载中...</div>
+                </div>
+
+                <!-- 热门活动 (关联子查询) -->
+                <h3 style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px;">🏆 热门活动（有批准报名）</h3>
+                <div id="popularActivitiesContainer" style="margin-bottom: 24px;">
+                    <div style="text-align: center; color: var(--gray-600);">加载中...</div>
+                </div>
+
+                <!-- 全能志愿者 (除法查询) -->
+                <h3 style="margin-bottom: 12px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px;">🌟 全能志愿者（参加所有分类活动）</h3>
+                <div id="omnipotentVolunteersContainer" style="margin-bottom: 24px;">
+                    <div style="text-align: center; color: var(--gray-600);">加载中...</div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -867,7 +923,7 @@
             document.getElementById('username').textContent = currentUser.username;
             
             const roleTag = document.getElementById('roleTag');
-            const isAdmin = currentUser.role_name === 'admin' || currentUser.role_id === 2;
+            const isAdmin = currentUser.role_name === '管理员';
             roleTag.textContent = isAdmin ? '管理员' : '普通用户';
             roleTag.className = `role-badge ${isAdmin ? 'admin' : ''}`;
 
@@ -892,6 +948,8 @@
             if (isAdmin) {
                 loadAdminData();
             } else {
+                loadAvailableActivities();
+                loadUpcomingActivities();
                 loadActivities();
                 loadMyApplications();
             }
@@ -927,6 +985,132 @@
                 })
                 .catch(err => {
                     container.innerHTML = `<div class="card"><div class="card-body"><div class="empty-state">搜索失败</div></div></div>`;
+                });
+        }
+
+        // 加载用户可申请的活动 (NOT IN集合操作)
+        function loadAvailableActivities() {
+            if (!currentUser || !currentUser.user_id) return;
+            
+            const container = document.getElementById('availableActivitiesContainer');
+            
+            fetch(`${API_BASE}/activities/available?user_id=${currentUser.user_id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && Array.isArray(data.data)) {
+                        if (data.data.length === 0) {
+                            container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray-600); background: var(--gray-50); border-radius: 8px;">暂无可申请的活动</div>';
+                            return;
+                        }
+                        
+                        let html = '';
+                        data.data.forEach(activity => {
+                            const fillRate = ((activity.current_apply_count / activity.max_people) * 100).toFixed(0);
+                            
+                            html += `
+                                <div style="padding: 16px; background: linear-gradient(135deg, #fff 0%, var(--gray-50) 100%); border-left: 4px solid #3b82f6; border-radius: 8px; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'" onclick="showActivityDetail(${activity.activity_id})">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                        <div style="flex: 1;">
+                                            <h4 style="margin: 0 0 8px 0; color: var(--primary-color); font-size: 16px; font-weight: 600;">${activity.title}</h4>
+                                            <div style="display: flex; gap: 12px; font-size: 13px; color: var(--gray-600); margin-bottom: 10px;">
+                                                <span>🏢 ${activity.dept_name || '-'}</span>
+                                                <span>📂 ${activity.category_name || '-'}</span>
+                                            </div>
+                                            <div style="display: flex; gap: 12px; align-items: center;">
+                                                <div style="flex: 1;">
+                                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                                        <span style="font-size: 12px; color: var(--gray-600);">报名进度</span>
+                                                        <span style="font-size: 12px; color: var(--primary-color); font-weight: 600;">${activity.current_apply_count}/${activity.max_people} (${fillRate}%)</span>
+                                                    </div>
+                                                    <div style="height: 6px; background: var(--gray-200); border-radius: 3px; overflow: hidden;">
+                                                        <div style="height: 100%; background: linear-gradient(90deg, #3b82f6, #06b6d4); width: ${fillRate}%; transition: width 0.3s;"></div>
+                                                    </div>
+                                                </div>
+                                                <div style="text-align: right; padding-left: 12px; border-left: 1px solid var(--gray-300);">
+                                                    <div style="font-size: 14px; color: #10b981; font-weight: 700;">${activity.remaining_slots} 席</div>
+                                                    <div style="font-size: 11px; color: var(--gray-600);">还可报名</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    ${activity.description ? `<div style="font-size: 13px; color: var(--gray-700); line-height: 1.5; margin-bottom: 12px; padding: 10px; background: rgba(59, 130, 246, 0.05); border-radius: 4px;">${activity.description}</div>` : ''}
+                                    <div style="display: flex; gap: 8px;">
+                                        <button class="btn btn-primary" onclick="event.stopPropagation(); showActivityDetail(${activity.activity_id})" style="flex: 1;">查看详情</button>
+                                        <button class="btn btn-success" onclick="event.stopPropagation(); showApplyModal(${activity.activity_id}, '${activity.title}')" style="flex: 1;">立即报名</button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        container.innerHTML = html;
+                    } else {
+                        container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray-600); background: var(--gray-50); border-radius: 8px;">暂无可申请的活动</div>';
+                    }
+                })
+                .catch(err => {
+                    container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray-600); background: var(--gray-50); border-radius: 8px;">加载失败</div>';
+                });
+        }
+
+        // 加载即将开始的活动 (日期时间函数)
+        function loadUpcomingActivities() {
+            const container = document.getElementById('upcomingActivitiesContainer');
+            
+            fetch(`${API_BASE}/activities/upcoming`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && Array.isArray(data.data)) {
+                        if (data.data.length === 0) {
+                            container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray-600); background: var(--gray-50); border-radius: 8px;">暂无即将开始的活动</div>';
+                            return;
+                        }
+                        
+                        let html = '';
+                        data.data.forEach(activity => {
+                            const daysRemaining = activity.days_remaining;
+                            const hoursRemaining = activity.hours_remaining;
+                            
+                            let timeDisplay = '';
+                            if (daysRemaining > 0) {
+                                timeDisplay = `还剩 ${daysRemaining} 天`;
+                            } else {
+                                timeDisplay = `还剩 ${hoursRemaining} 小时`;
+                            }
+                            
+                            const urgencyColor = daysRemaining <= 1 ? '#ef4444' : daysRemaining <= 2 ? '#f59e0b' : '#10b981';
+                            
+                            html += `
+                                <div style="padding: 16px; background: linear-gradient(135deg, #fff 0%, var(--gray-50) 100%); border-left: 4px solid ${urgencyColor}; border-radius: 8px; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'" onclick="showActivityDetail(${activity.activity_id})">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                        <div>
+                                            <h4 style="margin: 0 0 8px 0; color: var(--primary-color); font-size: 16px; font-weight: 600;">${activity.title}</h4>
+                                            <div style="display: flex; gap: 12px; font-size: 13px; color: var(--gray-600);">
+                                                <span>🏢 ${activity.dept_name || '-'}</span>
+                                                <span>📂 ${activity.category_name || '-'}</span>
+                                                <span>👥 ${activity.max_people}人</span>
+                                            </div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="font-size: 14px; color: ${urgencyColor}; font-weight: 700; margin-bottom: 4px;">${timeDisplay}</div>
+                                            <div style="font-size: 12px; color: var(--gray-600);">${activity.activity_time}</div>
+                                        </div>
+                                    </div>
+                                    ${activity.description ? `<div style="font-size: 13px; color: var(--gray-700); line-height: 1.5; margin-bottom: 12px;">${activity.description}</div>` : ''}
+                                    <div style="display: flex; gap: 8px;">
+                                        <button class="btn btn-primary" onclick="event.stopPropagation(); showActivityDetail(${activity.activity_id})">查看详情</button>
+                                        <button class="btn btn-success" onclick="event.stopPropagation(); showApplyModal(${activity.activity_id}, '${activity.title}')">立即报名</button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        container.innerHTML = html;
+                    } else {
+                        container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--gray-600); background: var(--gray-50); border-radius: 8px;">暂无即将开始的活动</div>';
+                    }
+                })
+                .catch(err => {
+                    container.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--danger-color); background: var(--gray-50); border-radius: 8px;">加载失败：${err.message}</div>`;
                 });
         }
 
@@ -1397,7 +1581,8 @@
                         document.getElementById('detailLocation').textContent = activity.location;
                         document.getElementById('detailTime').textContent = actTime;
                         document.getElementById('detailMaxPeople').textContent = activity.max_people;
-                        document.getElementById('detailDept').textContent = `部门 ${activity.dept_id}`;
+                        // 优化：现在显示部门名称而非ID（来自4表JOIN）
+                        document.getElementById('detailDept').textContent = `${activity.dept_name || '未分配'} / ${activity.category_name || '未分类'}`;
                         document.getElementById('detailDescription').textContent = activity.description || '暂无描述';
                         
                         document.getElementById('activityDetailModal').classList.add('show');
@@ -1468,6 +1653,7 @@
             const modal = document.getElementById('statisticsModal');
             modal.classList.add('show');
             
+            // 获取基础统计
             fetch(`${API_BASE}/statistics`)
                 .then(res => res.json())
                 .then(data => {
@@ -1484,7 +1670,144 @@
                     }
                 })
                 .catch(err => showAlert(err.message, 'error'));
+
+            // 获取部门统计
+            fetch(`${API_BASE}/statistics/departments`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;"><thead style="background: var(--gray-100);"><tr><th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--gray-300);">部门</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">活动数</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">平均容量</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">创建者</th></tr></thead><tbody>';
+                        if (data.data.length === 0) {
+                            html += '<tr><td colspan="4" style="padding: 16px; text-align: center; color: var(--gray-600);">暂无数据</td></tr>';
+                        } else {
+                            data.data.forEach(dept => {
+                                html += `<tr style="border-bottom: 1px solid var(--gray-300);"><td style="padding: 8px;">${dept.dept_name || '-'}</td><td style="padding: 8px; text-align: center;">${dept.activity_count || 0}</td><td style="padding: 8px; text-align: center;">${(dept.avg_capacity || 0).toFixed(1)}</td><td style="padding: 8px; text-align: center;">${dept.creator_count || 0}</td></tr>`;
+                            });
+                        }
+                        html += '</tbody></table></div>';
+                        document.getElementById('deptStatsContainer').innerHTML = html;
+                    }
+                })
+                .catch(err => document.getElementById('deptStatsContainer').innerHTML = `<div style="color: var(--danger-color);">加载失败: ${err.message}</div>`);
+
+            // 获取分类统计
+            fetch(`${API_BASE}/statistics/categories`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;"><thead style="background: var(--gray-100);"><tr><th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--gray-300);">分类</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">活动数</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">报名数</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">已批准</th></tr></thead><tbody>';
+                        if (data.data.length === 0) {
+                            html += '<tr><td colspan="4" style="padding: 16px; text-align: center; color: var(--gray-600);">暂无数据</td></tr>';
+                        } else {
+                            data.data.forEach(cat => {
+                                html += `<tr style="border-bottom: 1px solid var(--gray-300);"><td style="padding: 8px;">${cat.category_name || '-'}</td><td style="padding: 8px; text-align: center;">${cat.activity_count || 0}</td><td style="padding: 8px; text-align: center;">${cat.total_applications || 0}</td><td style="padding: 8px; text-align: center; color: #10b981;">${cat.approved_count || 0}</td></tr>`;
+                            });
+                        }
+                        html += '</tbody></table></div>';
+                        document.getElementById('categoryStatsContainer').innerHTML = html;
+                    }
+                })
+                .catch(err => document.getElementById('categoryStatsContainer').innerHTML = `<div style="color: var(--danger-color);">加载失败: ${err.message}</div>`);
+
+            // 获取活动热度排行
+            fetch(`${API_BASE}/statistics/activities/popularity`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;"><thead style="background: var(--gray-100);"><tr><th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--gray-300);">活动</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">容量</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">报名数</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">已批准</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">填充率</th></tr></thead><tbody>';
+                        if (data.data.length === 0) {
+                            html += '<tr><td colspan="5" style="padding: 16px; text-align: center; color: var(--gray-600);">暂无数据</td></tr>';
+                        } else {
+                            data.data.forEach((activity, idx) => {
+                                const fillRateColor = activity.fill_rate > 80 ? '#10b981' : activity.fill_rate > 50 ? '#f59e0b' : '#6b7280';
+                                html += `<tr style="border-bottom: 1px solid var(--gray-300);"><td style="padding: 8px;">${idx + 1}. ${activity.title || '-'}</td><td style="padding: 8px; text-align: center;">${activity.max_people || 0}</td><td style="padding: 8px; text-align: center;">${activity.application_count || 0}</td><td style="padding: 8px; text-align: center;">${activity.approved_count || 0}</td><td style="padding: 8px; text-align: center; color: ${fillRateColor}; font-weight: 700;">${(activity.fill_rate || 0).toFixed(1)}%</td></tr>`;
+                            });
+                        }
+                        html += '</tbody></table></div>';
+                        document.getElementById('popularityContainer').innerHTML = html;
+                    }
+                })
+                .catch(err => document.getElementById('popularityContainer').innerHTML = `<div style="color: var(--danger-color);">加载失败: ${err.message}</div>`);
+
+            // 获取用户活跃度
+            fetch(`${API_BASE}/statistics/users`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;"><thead style="background: var(--gray-100);"><tr><th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--gray-300);">用户</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">报名数</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">已批准</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">已拒绝</th></tr></thead><tbody>';
+                        if (data.data.length === 0) {
+                            html += '<tr><td colspan="4" style="padding: 16px; text-align: center; color: var(--gray-600);">暂无数据</td></tr>';
+                        } else {
+                            data.data.slice(0, 10).forEach((user, idx) => {
+                                html += `<tr style="border-bottom: 1px solid var(--gray-300);"><td style="padding: 8px;">${idx + 1}. ${user.username || '-'}</td><td style="padding: 8px; text-align: center;">${user.total_applied || 0}</td><td style="padding: 8px; text-align: center; color: #10b981;">${user.approved_count || 0}</td><td style="padding: 8px; text-align: center; color: var(--danger-color);">${user.rejected_count || 0}</td></tr>`;
+                            });
+                        }
+                        html += '</tbody></table></div>';
+                        document.getElementById('userActivityContainer').innerHTML = html;
+                    }
+                })
+                .catch(err => document.getElementById('userActivityContainer').innerHTML = `<div style="color: var(--danger-color);">加载失败: ${err.message}</div>`);
+
+            // 获取管理员创建统计
+            fetch(`${API_BASE}/statistics/admins`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;"><thead style="background: var(--gray-100);"><tr><th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--gray-300);">管理员</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">创建活动</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">收到报名</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">已批准</th></tr></thead><tbody>';
+                        if (data.data.length === 0) {
+                            html += '<tr><td colspan="4" style="padding: 16px; text-align: center; color: var(--gray-600);">暂无数据</td></tr>';
+                        } else {
+                            data.data.forEach((admin, idx) => {
+                                html += `<tr style="border-bottom: 1px solid var(--gray-300);"><td style="padding: 8px;">${idx + 1}. ${admin.username || '-'}</td><td style="padding: 8px; text-align: center;">${admin.created_activities || 0}</td><td style="padding: 8px; text-align: center;">${admin.total_applications || 0}</td><td style="padding: 8px; text-align: center; color: #10b981;">${admin.approved_applications || 0}</td></tr>`;
+                            });
+                        }
+                        html += '</tbody></table></div>';
+                        document.getElementById('adminStatsContainer').innerHTML = html;
+                    }
+                })
+                .catch(err => document.getElementById('adminStatsContainer').innerHTML = `<div style="color: var(--danger-color);">加载失败: ${err.message}</div>`);
+
+            // 获取热门活动（关联子查询）
+            fetch(`${API_BASE}/activities/popular`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;"><thead style="background: var(--gray-100);"><tr><th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--gray-300);">活动</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">创建者</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">已批准</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">待审批</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">填充率</th></tr></thead><tbody>';
+                        if (data.data.length === 0) {
+                            html += '<tr><td colspan="5" style="padding: 16px; text-align: center; color: var(--gray-600);">暂无热门活动（需要至少有1个已批准的报名）</td></tr>';
+                        } else {
+                            data.data.forEach((activity, idx) => {
+                                const fillRateColor = activity.fill_rate > 80 ? '#10b981' : activity.fill_rate > 50 ? '#f59e0b' : '#6b7280';
+                                html += `<tr style="border-bottom: 1px solid var(--gray-300);"><td style="padding: 8px;"><strong>${idx + 1}. ${activity.title}</strong><br><span style="font-size: 12px; color: var(--gray-600);">${activity.dept_name || '-'} / ${activity.category_name || '-'}</span></td><td style="padding: 8px; text-align: center; font-size: 13px;">${activity.creator_name || '-'}</td><td style="padding: 8px; text-align: center; color: #10b981; font-weight: 600;">${activity.approved_count || 0}</td><td style="padding: 8px; text-align: center; color: #f59e0b;">${activity.pending_count || 0}</td><td style="padding: 8px; text-align: center; color: ${fillRateColor}; font-weight: 700;">${(activity.fill_rate || 0).toFixed(1)}%</td></tr>`;
+                            });
+                        }
+                        html += '</tbody></table></div>';
+                        document.getElementById('popularActivitiesContainer').innerHTML = html;
+                    }
+                })
+                .catch(err => document.getElementById('popularActivitiesContainer').innerHTML = `<div style="color: var(--danger-color);">加载失败: ${err.message}</div>`);
+
+            // 获取全能志愿者（除法查询）
+            fetch(`${API_BASE}/statistics/omnipotent-volunteers`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;"><thead style="background: var(--gray-100);"><tr><th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--gray-300);">用户</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">已覆盖分类</th><th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--gray-300);">已批准参加</th></tr></thead><tbody>';
+                        if (data.data.length === 0) {
+                            html += '<tr><td colspan="3" style="padding: 16px; text-align: center; color: var(--gray-600);">暂无全能志愿者（尚无用户参加所有分类活动）</td></tr>';
+                        } else {
+                            data.data.forEach((volunteer, idx) => {
+                                const progress = ((volunteer.categories_participated / volunteer.total_categories_count) * 100).toFixed(0);
+                                html += `<tr style="border-bottom: 1px solid var(--gray-300);"><td style="padding: 8px;"><strong>${idx + 1}. ${volunteer.username}</strong><br><span style="font-size: 12px; color: var(--gray-600);">🏆 全能志愿者勋章</span></td><td style="padding: 8px; text-align: center;"><span style="background: #10b981; color: white; padding: 4px 8px; border-radius: 4px; font-weight: 600;">${volunteer.categories_participated}/${volunteer.total_categories_count}</span></td><td style="padding: 8px; text-align: center; color: #3b82f6; font-weight: 600;">${volunteer.approved_count}</td></tr>`;
+                            });
+                        }
+                        html += '</tbody></table></div>';
+                        document.getElementById('omnipotentVolunteersContainer').innerHTML = html;
+                    }
+                })
+                .catch(err => document.getElementById('omnipotentVolunteersContainer').innerHTML = `<div style="color: var(--danger-color);">加载失败: ${err.message}</div>`);
         }
+
 
         function closeStatisticsModal() {
             document.getElementById('statisticsModal').classList.remove('show');

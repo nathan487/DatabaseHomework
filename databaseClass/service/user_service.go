@@ -20,7 +20,7 @@ func Register(username, password, roleName string) (*model.LoginResponse, error)
 	}
 
 	if roleName == "" {
-		roleName = "user"
+		roleName = "普通用户"
 	} else {
 		roleName = strings.TrimSpace(roleName)
 	}
@@ -44,6 +44,7 @@ func Register(username, password, roleName string) (*model.LoginResponse, error)
 		UserID:   user.UserID,
 		Username: user.Username,
 		RoleName: role.RoleName,
+		RoleID:   role.RoleID,
 	}, nil
 }
 
@@ -66,5 +67,6 @@ func Login(username, password string) (*model.LoginResponse, error) {
 		UserID:   user.UserID,
 		Username: user.Username,
 		RoleName: role.RoleName,
+		RoleID:   user.RoleID,
 	}, nil
 }

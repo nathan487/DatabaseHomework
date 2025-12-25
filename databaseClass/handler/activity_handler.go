@@ -180,3 +180,38 @@ func GetActivityDetail(c *gin.Context) {
 		"data":    activity,
 	})
 }
+
+// GetAvailableActivities 获取用户可申请的活动（NOT IN集合操作）
+func GetAvailableActivities(c *gin.Context) {
+	userIDStr := c.Query("user_id")
+	if userIDStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "缺少用户ID",
+		})
+		return
+	}
+
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "用户ID格式不正确",
+		})
+		return
+	}
+
+	activities, err := service.GetAvailableActivities(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    activities,
+	})
+}

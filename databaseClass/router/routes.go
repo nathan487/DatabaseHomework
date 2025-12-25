@@ -48,6 +48,9 @@ func SetupRoutes(r *gin.Engine) {
 	{
 		activityGroup.GET("", handler.ListActivities)
 		activityGroup.GET("/search", handler.SearchActivities)
+		activityGroup.GET("/upcoming", handler.GetUpcomingActivities)
+		activityGroup.GET("/popular", handler.GetPopularActivities)
+		activityGroup.GET("/available", handler.GetAvailableActivities)
 		activityGroup.GET("/:id", handler.GetActivityDetail)
 		activityGroup.POST("", handler.CreateActivity)
 		activityGroup.PUT("/:id", handler.UpdateActivity)
@@ -63,4 +66,10 @@ func SetupRoutes(r *gin.Engine) {
 
 	// Statistics routes
 	r.GET("/statistics", handler.GetStatistics)
+	r.GET("/statistics/departments", handler.GetDeptStatistics)
+	r.GET("/statistics/categories", handler.GetCategoryStatistics)
+	r.GET("/statistics/users", handler.GetUserActivityStatistics)
+	r.GET("/statistics/activities/popularity", handler.GetActivityPopularity)
+	r.GET("/statistics/admins", handler.GetAdminCreationStatistics)
+	r.GET("/statistics/omnipotent-volunteers", handler.GetOmnipotentVolunteers)
 }

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>志愿者活动系统测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .section {
+            margin-bottom: 25px;
+            padding: 18px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .section h2 {
+            margin-top: 0;
+            font-size: 18px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 8px;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-group label {
+            display: inline-block;
+            width: 140px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            min-width: 160px;
+        }
+        .form-group input[type="number"] {
+            width: 100px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 4px 2px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button.delete {
+            background-color: #dc3545;
+        }
+        button.delete:hover {
+            background-color: #c82333;
+        }
+        button.update {
+            background-color: #28a745;
+        }
+        button.update:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .result.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .result.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+            text-align: left;
+            font-size: 13px;
+        }
+        th {
+            background-color: #f1f3f5;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .admin-section {
+            border-left: 4px solid #ffc107;
+        }
+        .tag {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 12px;
+            border-radius: 3px;
+            background-color: #e9ecef;
+        }
+        .tag.admin {
+            background-color: #ffeeba;
+        }
+        .tag.user {
+            background-color: #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div>
+            <span id="userInfo">当前用户：</span>
+            <span id="userRole" class="tag">角色：</span>
+        </div>
+        <div>
+            <button onclick="logout()" class="delete">退出登录</button>
+        </div>
+    </div>
+    <div class="container">
+        <div class="section">
+            <h2>1. 浏览活动列表（所有用户）</h2>
+            <div class="form-group">
+                <label>部门ID（可选）：</label>
+                <input type="number" id="filterDeptId" placeholder="如 1">
+                <label>分类ID（可选）：</label>
+                <input type="number" id="filterCategoryId" placeholder="如 1">
+                <button onclick="loadActivities()">加载活动</button>
+            </div>
+            <div id="activityList"></div>
+        </div>
+        <div class="section">
+            <h2>2. 申请参加活动（普通用户）</h2>
+            <div class="form-group">
+                <label>活动ID：</label>
+                <input type="number" id="applyActivityId" placeholder="请输入要报名的活动ID">
+                <button onclick="applyActivity()">申请参加</button>
+            </div>
+            <div id="applyResult" class="result"></div>
+        </div>
+        <div class="section">
+            <h2>3. 我的报名记录（所有登录用户）</h2>
+            <button onclick="loadMyApplications()">刷新我的报名记录</button>
+            <div id="myApplications"></div>
+        </div>
+    </div>
+    <div class="container admin-section" id="adminContainer">
+        <div class="section">
+            <h2>4. 管理员：新增活动</h2>
+            <div class="form-group">
+                <label>部门ID：</label>
+                <input type="number" id="createDeptId" value="1">
+            </div>
+            <div class="form-group">
+                <label>分类ID：</label>
+                <input type="number" id="createCategoryId" value="1">
+            </div>
+            <div class="form-group">
+                <label>活动标题：</label>
+                <input type="text" id="createTitle" value="志愿者服务活动">
+            </div>
+            <div class="form-group">
+                <label>活动时间：</label>
+                <input type="datetime-local" id="createActivityTime">
+            </div>
+            <div class="form-group">
+                <label>活动地点：</label>
+                <input type="text" id="createLocation" value="社区服务中心">
+            </div>
+            <div class="form-group">
+                <label>最大人数：</label>
+                <input type="number" id="createMaxPeople" value="20">
+            </div>
+            <button class="update" onclick="createActivity()">创建活动</button>
+            <div id="createActivityResult" class="result"></div>
+        </div>
+        <div class="section">
+            <h2>5. 管理员：修改活动</h2>
+            <div class="form-group">
+                <label>活动ID：</label>
+                <input type="number" id="updateActivityId" placeholder="要修改的活动ID">
+            </div>
+            <div class="form-group">
+                <label>部门ID：</label>
+                <input type="number" id="updateDeptId" value="1">
+            </div>
+            <div class="form-group">
+                <label>分类ID：</label>
+                <input type="number" id="updateCategoryId" value="1">
+            </div>
+            <div class="form-group">
+                <label>活动标题：</label>
+                <input type="text" id="updateTitle" value="修改后的活动标题">
+            </div>
+            <div class="form-group">
+                <label>活动时间：</label>
+                <input type="datetime-local" id="updateActivityTime">
+            </div>
+            <div class="form-group">
+                <label>活动地点：</label>
+                <input type="text" id="updateLocation" value="更新后的地点">
+            </div>
+            <div class="form-group">
+                <label>最大人数：</label>
+                <input type="number" id="updateMaxPeople" value="30">
+            </div>
+            <button class="update" onclick="updateActivity()">更新活动</button>
+            <div id="updateActivityResult" class="result"></div>
+        </div>
+        <div class="section">
+            <h2>6. 管理员：删除活动</h2>
+            <div class="form-group">
+                <label>活动ID：</label>
+                <input type="number" id="deleteActivityId" placeholder="要删除的活动ID">
+                <button class="delete" onclick="deleteActivity()">删除活动</button>
+            </div>
+            <div id="deleteActivityResult" class="result"></div>
+        </div>
+        <div class="section">
+            <h2>7. 管理员：查看活动报名名单</h2>
+            <div class="form-group">
+                <label>活动ID：</label>
+                <input type="number" id="manageActivityId" placeholder="要查看的活动ID">
+                <button onclick="loadActivityApplications()">查看报名名单</button>
+            </div>
+            <div id="activityApplications"></div>
+        </div>
+        <div class="section">
+            <h2>8. 管理员：审核报名</h2>
+            <div class="form-group">
+                <label>报名ID：</label>
+                <input type="number" id="reviewApplicationId" placeholder="报名记录ID">
+            </div>
+            <div class="form-group">
+                <label>审批结果：</label>
+                <select id="reviewStatus">
+                    <option value="approved">通过</option>
+                    <option value="rejected">拒绝</option>
+                </select>
+            </div>
+            <button class="update" onclick="updateApplicationStatus()">提交审核结果</button>
+            <div id="reviewResult" class="result"></div>
+        </div>
+    </div>
+    <script>
+        const API_BASE = 'http://localhost:8080';
+        let currentUser = null;
+        function showResult(elementId, data, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            element.className = `result ${isSuccess ? 'success' : 'error'}`;
+            element.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        }
+        function renderActivityTable(containerId, activities) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            if (!Array.isArray(activities) || activities.length === 0) {
+                container.innerHTML = '<div class="result">暂无活动数据</div>';
+                return;
+            }
+            let html = '<table><thead><tr>' +
+                '<th>ID</th><th>标题</th><th>时间</th><th>地点</th><th>人数上限</th><th>部门ID</th><th>分类ID</th></tr></thead><tbody>';
+            activities.forEach(a => {
+                const timeText = a.activity_time ? ('' + a.activity_time).replace('T', ' ').substring(0, 16) : '';
+                html += `<tr>
+                    <td>${a.activity_id}</td>
+                    <td>${a.title}</td>
+                    <td>${timeText}</td>
+                    <td>${a.location}</td>
+                    <td>${a.max_people}</td>
+                    <td>${a.dept_id}</td>
+                    <td>${a.category_id}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        function renderApplications(containerId, apps) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            if (!Array.isArray(apps) || apps.length === 0) {
+                container.innerHTML = '<div class="result">暂无报名记录</div>';
+                return;
+            }
+            let html = '<table><thead><tr>' +
+                '<th>报名ID</th><th>活动ID</th><th>活动标题</th><th>地点</th><th>活动时间</th><th>申请时间</th><th>状态</th></tr></thead><tbody>';
+            apps.forEach(a => {
+                const actTime = a.activity_time ? ('' + a.activity_time).replace('T', ' ').substring(0, 16) : '';
+                const applyTime = a.apply_time ? ('' + a.apply_time).replace('T', ' ').substring(0, 16) : '';
+                html += `<tr>
+                    <td>${a.application_id}</td>
+                    <td>${a.activity_id}</td>
+                    <td>${a.title || ''}</td>
+                    <td>${a.location || ''}</td>
+                    <td>${actTime}</td>
+                    <td>${applyTime}</td>
+                    <td>${a.current_status}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        function renderActivityApplications(containerId, apps) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            if (!Array.isArray(apps) || apps.length === 0) {
+                container.innerHTML = '<div class="result">当前活动暂无报名</div>';
+                return;
+            }
+            let html = '<table><thead><tr>' +
+                '<th>报名ID</th><th>用户ID</th><th>用户名</th><th>申请时间</th><th>状态</th></tr></thead><tbody>';
+            apps.forEach(a => {
+                const applyTime = a.apply_time ? ('' + a.apply_time).replace('T', ' ').substring(0, 16) : '';
+                html += `<tr>
+                    <td>${a.application_id}</td>
+                    <td>${a.user_id}</td>
+                    <td>${a.username}</td>
+                    <td>${applyTime}</td>
+                    <td>${a.current_status}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        function loadActivities() {
+            const deptId = document.getElementById('filterDeptId').value;
+            const categoryId = document.getElementById('filterCategoryId').value;
+            const params = [];
+            if (deptId) params.push(`dept_id=${deptId}`);
+            if (categoryId) params.push(`category_id=${categoryId}`);
+            const query = params.length ? '?' + params.join('&') : '';
+            fetch(`${API_BASE}/activities${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        renderActivityTable('activityList', data.data || []);
+                    } else {
+                        document.getElementById('activityList').innerHTML = `<div class="result error">${data.message || '加载失败'}</div>`;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('activityList').innerHTML = `<div class="result error">网络错误：${err.message}</div>`;
+                });
+        }
+        function applyActivity() {
+            if (!currentUser || !currentUser.user_id) {
+                showResult('applyResult', { error: '未获取到当前用户信息' }, false);
+                return;
+            }
+            const activityId = document.getElementById('applyActivityId').value;
+            if (!activityId) {
+                showResult('applyResult', { error: '请输入活动ID' }, false);
+                return;
+            }
+            fetch(`${API_BASE}/activities/${activityId}/apply`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: currentUser.user_id })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    showResult('applyResult', data, data.success);
+                    if (data.success) {
+                        loadMyApplications();
+                    }
+                })
+                .catch(err => {
+                    showResult('applyResult', { error: err.message }, false);
+                });
+        }
+        function loadMyApplications() {
+            if (!currentUser || !currentUser.user_id) return;
+            fetch(`${API_BASE}/users/${currentUser.user_id}/applications`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        renderApplications('myApplications', data.data || []);
+                    } else {
+                        document.getElementById('myApplications').innerHTML = `<div class="result error">${data.message || '加载失败'}</div>`;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('myApplications').innerHTML = `<div class="result error">网络错误：${err.message}</div>`;
+                });
+        }
+        function createActivity() {
+            if (!currentUser || currentUser.role_name !== 'admin') {
+                showResult('createActivityResult', { error: '只有管理员可以创建活动' }, false);
+                return;
+            }
+            const dept_id = parseInt(document.getElementById('createDeptId').value || '0', 10);
+            const category_id = parseInt(document.getElementById('createCategoryId').value || '0', 10);
+            const title = document.getElementById('createTitle').value.trim();
+            const activity_time = document.getElementById('createActivityTime').value;
+            const location = document.getElementById('createLocation').value.trim();
+            const max_people = parseInt(document.getElementById('createMaxPeople').value || '0', 10);
+            if (!title || !activity_time || !location || !dept_id || !category_id || !max_people) {
+                showResult('createActivityResult', { error: '请完整填写活动信息' }, false);
+                return;
+            }
+            fetch(`${API_BASE}/activities`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dept_id,
+                    category_id,
+                    creator_id: currentUser.user_id,
+                    title,
+                    activity_time,
+                    location,
+                    max_people
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    showResult('createActivityResult', data, data.success);
+                    if (data.success) {
+                        loadActivities();
+                    }
+                })
+                .catch(err => {
+                    showResult('createActivityResult', { error: err.message }, false);
+                });
+        }
+        function updateActivity() {
+            if (!currentUser || currentUser.role_name !== 'admin') {
+                showResult('updateActivityResult', { error: '只有管理员可以修改活动' }, false);
+                return;
+            }
+            const activityId = document.getElementById('updateActivityId').value;
+            if (!activityId) {
+                showResult('updateActivityResult', { error: '请输入活动ID' }, false);
+                return;
+            }
+            const dept_id = parseInt(document.getElementById('updateDeptId').value || '0', 10);
+            const category_id = parseInt(document.getElementById('updateCategoryId').value || '0', 10);
+            const title = document.getElementById('updateTitle').value.trim();
+            const activity_time = document.getElementById('updateActivityTime').value;
+            const location = document.getElementById('updateLocation').value.trim();
+            const max_people = parseInt(document.getElementById('updateMaxPeople').value || '0', 10);
+            if (!title || !activity_time || !location || !dept_id || !category_id || !max_people) {
+                showResult('updateActivityResult', { error: '请完整填写活动信息' }, false);
+                return;
+            }
+            fetch(`${API_BASE}/activities/${activityId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dept_id,
+                    category_id,
+                    creator_id: currentUser.user_id,
+                    title,
+                    activity_time,
+                    location,
+                    max_people
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    showResult('updateActivityResult', data, data.success);
+                    if (data.success) {
+                        loadActivities();
+                    }
+                })
+                .catch(err => {
+                    showResult('updateActivityResult', { error: err.message }, false);
+                });
+        }
+        function deleteActivity() {
+            if (!currentUser || currentUser.role_name !== 'admin') {
+                showResult('deleteActivityResult', { error: '只有管理员可以删除活动' }, false);
+                return;
+            }
+            const activityId = document.getElementById('deleteActivityId').value;
+            if (!activityId) {
+                showResult('deleteActivityResult', { error: '请输入活动ID' }, false);
+                return;
+            }
+            if (!confirm(`确定要删除活动 ${activityId} 吗？`)) return;
+            fetch(`${API_BASE}/activities/${activityId}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    showResult('deleteActivityResult', data, data.success);
+                    if (data.success) {
+                        loadActivities();
+                    }
+                })
+                .catch(err => {
+                    showResult('deleteActivityResult', { error: err.message }, false);
+                });
+        }
+        function loadActivityApplications() {
+            if (!currentUser || currentUser.role_name !== 'admin') {
+                document.getElementById('activityApplications').innerHTML = '<div class="result error">只有管理员可以查看报名名单</div>';
+                return;
+            }
+            const activityId = document.getElementById('manageActivityId').value;
+            if (!activityId) {
+                document.getElementById('activityApplications').innerHTML = '<div class="result error">请输入活动ID</div>';
+                return;
+            }
+            fetch(`${API_BASE}/activities/${activityId}/applications`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        renderActivityApplications('activityApplications', data.data || []);
+                    } else {
+                        document.getElementById('activityApplications').innerHTML = `<div class="result error">${data.message || '加载失败'}</div>`;
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('activityApplications').innerHTML = `<div class="result error">网络错误：${err.message}</div>`;
+                });
+        }
+        function updateApplicationStatus() {
+            if (!currentUser || currentUser.role_name !== 'admin') {
+                showResult('reviewResult', { error: '只有管理员可以审核报名' }, false);
+                return;
+            }
+            const applicationId = document.getElementById('reviewApplicationId').value;
+            const status = document.getElementById('reviewStatus').value;
+            if (!applicationId) {
+                showResult('reviewResult', { error: '请输入报名ID' }, false);
+                return;
+            }
+            fetch(`${API_BASE}/applications/${applicationId}/status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status, handler_id: currentUser.user_id })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    showResult('reviewResult', data, data.success);
+                    if (data.success) {
+                        loadActivityApplications();
+                        loadMyApplications();
+                    }
+                })
+                .catch(err => {
+                    showResult('reviewResult', { error: err.message }, false);
+                });
+        }
+        function logout() {
+            if (!confirm('确定要退出登录吗？')) return;
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+        function initPage() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (!isLoggedIn) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!currentUser || !currentUser.username) {
+                window.location.href = 'login.html';
+                return;
+            }
+            document.getElementById('userInfo').textContent = `当前用户：${currentUser.username}`;
+            const roleTag = document.getElementById('userRole');
+            const roleName = (currentUser.role_name || '').toLowerCase();
+            roleTag.textContent = `角色：${roleName}`;
+            roleTag.className = 'tag ' + (roleName === 'admin' ? 'admin' : 'user');
+            const adminContainer = document.getElementById('adminContainer');
+            if (roleName !== 'admin') {
+                adminContainer.style.display = 'none';
+            } else {
+                adminContainer.style.display = 'block';
+            }
+            const createTimeInput = document.getElementById('createActivityTime');
+            const updateTimeInput = document.getElementById('updateActivityTime');
+            const now = new Date();
+            const pad = n => n.toString().padStart(2, '0');
+            const localStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+            if (createTimeInput) createTimeInput.value = localStr;
+            if (updateTimeInput) updateTimeInput.value = localStr;
+            loadActivities();
+            loadMyApplications();
+        }
+        window.onload = initPage;
+    </script>
+</body>
+</html>

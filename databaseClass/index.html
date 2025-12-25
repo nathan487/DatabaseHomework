@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>志愿者活动管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary-color: #764ba2;
+            --success-color: #48bb78;
+            --danger-color: #f56565;
+            --warning-color: #ed8936;
+            --info-color: #4299e1;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .user-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .username {
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .role-badge {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .role-badge.admin {
+            background: var(--warning-color);
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #e53e3e;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--gray-700);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .btn-block {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .table th {
+            background: var(--gray-100);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-700);
+            border-bottom: 2px solid var(--gray-200);
+            font-size: 13px;
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 14px;
+        }
+
+        .table tr:hover {
+            background: var(--gray-50);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #7f1d1d;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-expired {
+            background: #f3e8e8;
+            color: #5f2c2c;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #7f1d1d;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px rgba(0,0,0,0.15);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray-500);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-500);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 24px;
+        }
+
+        .filter-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .admin-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-500);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .activity-card {
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .activity-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 8px;
+        }
+
+        .activity-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: var(--gray-600);
+        }
+
+        .activity-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .activity-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .activity-actions button {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                padding: 0 16px;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
+            }
+
+            .container {
+                padding: 16px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">🎯 志愿者活动管理系统</div>
+            <div class="user-info">
+                <div class="user-profile">
+                    <div class="avatar" id="avatar"></div>
+                    <div class="user-text">
+                        <div class="username" id="username"></div>
+                        <span class="role-badge" id="roleTag"></span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">退出登录</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- User Section -->
+        <div id="userSection">
+            <div class="section-title">活动浏览与报名</div>
+            
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="form-group">
+                    <label>搜索活动</label>
+                    <input type="text" id="searchKeyword" placeholder="输入活动名称">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary btn-block" onclick="searchActivities()">搜索</button>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="form-group">
+                    <label>部门</label>
+                    <select id="filterDept" onchange="loadActivities()">
+                        <option value="">全部部门</option>
+                        <option value="1">志愿服务部</option>
+                        <option value="2">社会福利部</option>
+                        <option value="3">环保宣传部</option>
+                        <option value="4">教育培训部</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>分类</label>
+                    <select id="filterCategory" onchange="loadActivities()">
+                        <option value="">全部分类</option>
+                        <option value="1">社区服务</option>
+                        <option value="2">环境保护</option>
+                        <option value="3">教育培训</option>
+                        <option value="4">老人护理</option>
+                        <option value="5">儿童关爱</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary btn-block" onclick="loadActivities()">筛选</button>
+                </div>
+            </div>
+
+            <!-- Activities -->
+            <div class="content-grid" id="activitiesContainer"></div>
+        </div>
+
+        <!-- User Applications -->
+        <div id="userApplicationsSection" style="margin-top: 40px;">
+            <div class="section-title">我的报名记录</div>
+            <div id="myApplicationsContainer" class="card">
+                <div class="card-body">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Section -->
+        <div id="adminSection" style="display: none; margin-top: 40px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div class="section-title" style="margin: 0;">管理员工作台</div>
+                <button class="btn btn-primary" onclick="openStatisticsModal()">📊 查看统计</button>
+            </div>
+            <div class="admin-panel">
+                <!-- Create Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">创建新活动</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>活动描述</label>
+                            <textarea id="createDescription" placeholder="输入活动描述（可选）" style="height: 100px; resize: vertical;"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>活动标题</label>
+                            <input type="text" id="createTitle" placeholder="输入活动标题">
+                        </div>
+                        <div class="form-group">
+                            <label>部门</label>
+                            <select id="createDept">
+                                <option value="1">志愿服务部</option>
+                                <option value="2">社会福利部</option>
+                                <option value="3">环保宣传部</option>
+                                <option value="4">教育培训部</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>分类</label>
+                            <select id="createCategory">
+                                <option value="1">社区服务</option>
+                                <option value="2">环境保护</option>
+                                <option value="3">教育培训</option>
+                                <option value="4">老人护理</option>
+                                <option value="5">儿童关爱</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>活动时间</label>
+                            <input type="datetime-local" id="createTime">
+                        </div>
+                        <div class="form-group">
+                            <label>活动地点</label>
+                            <input type="text" id="createLocation" placeholder="输入活动地点">
+                        </div>
+                        <div class="form-group">
+                            <label>最大人数</label>
+                            <input type="number" id="createMaxPeople" placeholder="输入最大参与人数" min="1">
+                        </div>
+                        <button class="btn btn-primary btn-block" onclick="createActivity()">创建活动</button>
+                    </div>
+                </div>
+
+                <!-- Manage Activities -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">活动管理</div>
+                        <div class="card-subtitle">编辑、删除活动</div>
+                    </div>
+                    <div class="card-body">
+                        <div id="activitiesManageContainer"></div>
+                    </div>
+                </div>
+
+                <!-- Review Applications -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">报名审核</div>
+                        <div class="card-subtitle">查看和审批用户报名</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>选择活动</label>
+                            <select id="selectActivityForReview" onchange="loadActivityApplications()">
+                                <option value="">选择活动...</option>
+                            </select>
+                        </div>
+                        <div id="applicationsReviewContainer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Activity Modal -->
+    <div id="editActivityModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">编辑活动</div>
+                <button class="modal-close" onclick="closeEditModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>活动标题</label>
+                    <input type="text" id="editTitle" placeholder="输入活动标题">
+                </div>
+                <div class="form-group">
+                    <label>活动描述</label>
+                    <textarea id="editDescription" placeholder="输入活动描述（可选）" style="height: 100px; resize: vertical;"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>部门</label>
+                        <select id="editDept">
+                            <option value="1">志愿服务部</option>
+                            <option value="2">社会福利部</option>
+                            <option value="3">环保宣传部</option>
+                            <option value="4">教育培训部</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>分类</label>
+                        <select id="editCategory">
+                            <option value="1">社区服务</option>
+                            <option value="2">环境保护</option>
+                            <option value="3">教育培训</option>
+                            <option value="4">老人护理</option>
+                            <option value="5">儿童关爱</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>活动时间</label>
+                    <input type="datetime-local" id="editTime">
+                </div>
+                <div class="form-group">
+                    <label>活动地点</label>
+                    <input type="text" id="editLocation" placeholder="输入活动地点">
+                </div>
+                <div class="form-group">
+                    <label>最大人数</label>
+                    <input type="number" id="editMaxPeople" placeholder="输入最大参与人数" min="1">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="submitEditActivity()">保存修改</button>
+                <button class="btn" style="background: var(--gray-300); color: var(--gray-800);" onclick="closeEditModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Detail Modal -->
+    <div id="activityDetailModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <div class="modal-title" id="detailTitle">活动详情</div>
+                <button class="modal-close" onclick="closeDetailModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group" style="border-bottom: 1px solid var(--gray-200); padding-bottom: 16px;">
+                    <h3 id="detailActivityTitle" style="margin: 0 0 8px 0; color: var(--gray-800);"></h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; color: var(--gray-600);">
+                        <div>📍 <span id="detailLocation"></span></div>
+                        <div>⏰ <span id="detailTime"></span></div>
+                        <div>👥 最多<span id="detailMaxPeople"></span>人</div>
+                        <div>🏢 <span id="detailDept"></span></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>活动描述</label>
+                    <div id="detailDescription" style="padding: 12px; background: var(--gray-50); border-radius: 6px; min-height: 120px; line-height: 1.6; white-space: pre-wrap;"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="applyFromDetail()">报名参加</button>
+                <button class="btn" style="background: var(--gray-300); color: var(--gray-800);" onclick="closeDetailModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div id="statisticsModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <div class="modal-title">系统统计仪表盘</div>
+                <button class="modal-close" onclick="closeStatisticsModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">总活动数</div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--primary-color);" id="statTotalActivities">0</div>
+                    </div>
+                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">活跃活动</div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--success-color);" id="statActiveActivities">0</div>
+                    </div>
+                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">总用户数</div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--info-color);" id="statTotalUsers">0</div>
+                    </div>
+                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">总报名数</div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--warning-color);" id="statTotalApplications">0</div>
+                    </div>
+                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">已批准</div>
+                        <div style="font-size: 28px; font-weight: 700; color: #10b981;" id="statApprovedApplications">0</div>
+                    </div>
+                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">待审批</div>
+                        <div style="font-size: 28px; font-weight: 700; color: #f59e0b;" id="statPendingApplications">0</div>
+                    </div>
+                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">已拒绝</div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--danger-color);" id="statRejectedApplications">0</div>
+                    </div>
+                    <div style="padding: 16px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">已过期活动</div>
+                        <div style="font-size: 28px; font-weight: 700; color: #6b7280;" id="statExpiredActivities">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: var(--gray-300); color: var(--gray-800);" onclick="closeStatisticsModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div id="alertModal" class="alert"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080';
+        let currentUser = null;
+        let editingActivityId = null;
+        let detailingActivityId = null;
+
+        // Utility Functions
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alertModal');
+            alert.textContent = message;
+            alert.className = `alert show alert-${type}`;
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 4000);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Initialization
+        function initPage() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (!isLoggedIn) {
+                window.location.href = '/login';
+                return;
+            }
+
+            currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!currentUser || !currentUser.user_id) {
+                window.location.href = '/login';
+                return;
+            }
+
+            // Set user info
+            const firstLetter = currentUser.username.charAt(0).toUpperCase();
+            document.getElementById('avatar').textContent = firstLetter;
+            document.getElementById('username').textContent = currentUser.username;
+            
+            const roleTag = document.getElementById('roleTag');
+            const isAdmin = currentUser.role_name === 'admin' || currentUser.role_id === 2;
+            roleTag.textContent = isAdmin ? '管理员' : '普通用户';
+            roleTag.className = `role-badge ${isAdmin ? 'admin' : ''}`;
+
+            // Show/hide sections - 管理员只显示管理员工作台
+            if (isAdmin) {
+                document.getElementById('userSection').style.display = 'none';
+                document.getElementById('userApplicationsSection').style.display = 'none';
+                document.getElementById('adminSection').style.display = 'block';
+            } else {
+                document.getElementById('userSection').style.display = 'block';
+                document.getElementById('userApplicationsSection').style.display = 'block';
+                document.getElementById('adminSection').style.display = 'none';
+            }
+
+            // Set datetime-local default
+            const now = new Date();
+            const localStr = now.toISOString().slice(0, 16);
+            const createTimeInput = document.getElementById('createTime');
+            if (createTimeInput) createTimeInput.value = localStr;
+
+            // Load data
+            if (isAdmin) {
+                loadAdminData();
+            } else {
+                loadActivities();
+                loadMyApplications();
+            }
+        }
+
+        function logout() {
+            if (!confirm('确定要退出登录吗？')) return;
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('currentUser');
+            window.location.href = '/login';
+        }
+
+        // Activity Functions
+        function searchActivities() {
+            const keyword = document.getElementById('searchKeyword').value.trim();
+            
+            if (!keyword) {
+                showAlert('请输入搜索关键词', 'error');
+                return;
+            }
+
+            const container = document.getElementById('activitiesContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+            fetch(`${API_BASE}/activities/search?keyword=${encodeURIComponent(keyword)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && Array.isArray(data.data)) {
+                        renderActivities(data.data, container);
+                    } else {
+                        container.innerHTML = '<div class="card"><div class="card-body"><div class="empty-state">未找到匹配的活动</div></div></div>';
+                    }
+                })
+                .catch(err => {
+                    container.innerHTML = `<div class="card"><div class="card-body"><div class="empty-state">搜索失败</div></div></div>`;
+                });
+        }
+
+        function loadActivities() {
+            const deptId = document.getElementById('filterDept').value;
+            const categoryId = document.getElementById('filterCategory').value;
+
+            let url = `${API_BASE}/activities`;
+            const params = [];
+            if (deptId) params.push(`dept_id=${deptId}`);
+            if (categoryId) params.push(`category_id=${categoryId}`);
+            if (params.length) url += '?' + params.join('&');
+
+            const container = document.getElementById('activitiesContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && Array.isArray(data.data)) {
+                        renderActivities(data.data, container);
+                    } else {
+                        container.innerHTML = '<div class="card"><div class="card-body"><div class="empty-state">暂无活动数据</div></div></div>';
+                    }
+                })
+                .catch(err => {
+                    container.innerHTML = `<div class="card"><div class="card-body"><div class="empty-state">加载失败：${err.message}</div></div></div>`;
+                });
+        }
+
+        function renderActivities(activities, container) {
+            if (!activities.length) {
+                container.innerHTML = '<div class="card"><div class="card-body"><div class="empty-state">暂无活动</div></div></div>';
+                return;
+            }
+
+            let html = '';
+            activities.forEach(activity => {
+                const status = activity.status || 'active';
+                const statusText = status === 'active' ? '进行中' : '已过期';
+                const statusClass = status === 'active' ? 'status-active' : 'status-expired';
+                
+                const actTime = new Date(activity.activity_time);
+                const timeStr = actTime.toLocaleString('zh-CN', { 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+
+                html += `
+                    <div class="card">
+                        <div class="card-body">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                <h3 class="activity-title" style="cursor: pointer; color: var(--primary-color);" onclick="showActivityDetail(${activity.activity_id})">${activity.title}</h3>
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                            </div>
+                            <div class="activity-meta">
+                                <div class="activity-meta-item">📍 ${activity.location}</div>
+                                <div class="activity-meta-item">⏰ ${timeStr}</div>
+                                <div class="activity-meta-item">👥 ${activity.max_people}人</div>
+                                <div class="activity-meta-item">🏢 部门${activity.dept_id}</div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                <button class="btn btn-primary" style="margin-top: 12px;" onclick="showActivityDetail(${activity.activity_id})">
+                                    查看详情
+                                </button>
+                                ${status === 'active' ? `
+                                    <button class="btn btn-success" style="margin-top: 12px;" onclick="showApplyModal(${activity.activity_id}, '${activity.title}')">
+                                        立即报名
+                                    </button>
+                                ` : `
+                                    <button class="btn btn-primary" style="margin-top: 12px; opacity: 0.6; cursor: not-allowed;" disabled>
+                                        已过期
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function showApplyModal(activityId, activityTitle) {
+            if (!confirm(`确定要报名参加"${activityTitle}"吗？`)) return;
+
+            if (!currentUser || !currentUser.user_id) {
+                showAlert('用户信息获取失败', 'error');
+                return;
+            }
+
+            fetch(`${API_BASE}/activities/${activityId}/apply`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: currentUser.user_id })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('报名成功！', 'success');
+                        loadMyApplications();
+                        loadActivities();
+                    } else {
+                        showAlert(data.message || '报名失败', 'error');
+                    }
+                })
+                .catch(err => {
+                    showAlert(err.message, 'error');
+                });
+        }
+
+        function loadMyApplications() {
+            if (!currentUser || !currentUser.user_id) return;
+
+            fetch(`${API_BASE}/users/${currentUser.user_id}/applications`)
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('myApplicationsContainer');
+                    if (data.success && Array.isArray(data.data)) {
+                        renderMyApplications(data.data, container);
+                    } else {
+                        container.innerHTML = '<div class="card-body"><div class="empty-state">暂无报名记录</div></div>';
+                    }
+                })
+                .catch(err => {
+                    const container = document.getElementById('myApplicationsContainer');
+                    container.innerHTML = `<div class="card-body"><div class="empty-state">加载失败</div></div>`;
+                });
+        }
+
+        function renderMyApplications(applications, container) {
+            if (!applications.length) {
+                container.innerHTML = '<div class="card-body"><div class="empty-state">暂无报名记录</div></div>';
+                return;
+            }
+
+            let html = '<div class="card-body"><table class="table"><thead><tr>';
+            html += '<th>活动</th><th>申请时间</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+
+            applications.forEach(app => {
+                const applyTime = new Date(app.apply_time).toLocaleString('zh-CN');
+                const statusClass = `status-${app.current_status}`;
+                const statusText = {
+                    'pending': '待审批',
+                    'approved': '已批准',
+                    'rejected': '已拒绝'
+                }[app.current_status] || app.current_status;
+                
+                // 检查是否可以取消报名（待审批或已批准的活动）
+                const canCancel = (app.current_status === 'pending' || app.current_status === 'approved');
+
+                html += `<tr>
+                    <td>${app.title || '活动 ' + app.activity_id}</td>
+                    <td>${applyTime}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        ${canCancel ? `
+                            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="cancelApplicationConfirm(${app.application_id})">取消报名</button>
+                        ` : '<span style="color: var(--gray-400); font-size: 12px;">无法取消</span>'}
+                    </td>
+                </tr>`;
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        // Admin Functions
+        function loadAdminData() {
+            loadActivitiesForManage();
+            loadActivitySelect();
+        }
+
+        function loadActivitiesForManage() {
+            fetch(`${API_BASE}/activities`)
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('activitiesManageContainer');
+                    if (data.success && Array.isArray(data.data)) {
+                        renderActivitiesForManage(data.data, container);
+                    } else {
+                        container.innerHTML = '<div class="empty-state">暂无活动</div>';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('activitiesManageContainer').innerHTML = '<div class="empty-state">加载失败</div>';
+                });
+        }
+
+        function renderActivitiesForManage(activities, container) {
+            if (!activities.length) {
+                container.innerHTML = '<div class="empty-state">暂无活动</div>';
+                return;
+            }
+
+            let html = '';
+            activities.forEach(activity => {
+                html += `
+                    <div class="activity-card">
+                        <div class="activity-title">${activity.title}</div>
+                        <div style="font-size: 13px; color: var(--gray-600); margin-bottom: 12px;">
+                            ${activity.location} | 最多${activity.max_people}人
+                        </div>
+                        <div class="activity-actions">
+                            <button class="btn btn-primary" style="flex: 1;" onclick="showEditActivityModal(${activity.activity_id})">编辑</button>
+                            <button class="btn btn-danger" style="flex: 1;" onclick="deleteActivity(${activity.activity_id})">删除</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function createActivity() {
+            const title = document.getElementById('createTitle').value.trim();
+            const description = document.getElementById('createDescription').value.trim();
+            const deptId = parseInt(document.getElementById('createDept').value || '0', 10);
+            const categoryId = parseInt(document.getElementById('createCategory').value || '0', 10);
+            const activityTime = document.getElementById('createTime').value;
+            const location = document.getElementById('createLocation').value.trim();
+            const maxPeople = parseInt(document.getElementById('createMaxPeople').value || '0', 10);
+
+            if (!title || !location || !activityTime || !maxPeople) {
+                showAlert('请填写完整的活动信息', 'error');
+                return;
+            }
+
+            fetch(`${API_BASE}/activities`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dept_id: deptId,
+                    category_id: categoryId,
+                    creator_id: currentUser.user_id,
+                    title,
+                    description,
+                    activity_time: activityTime,
+                    location,
+                    max_people: maxPeople
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('活动创建成功！', 'success');
+                        document.getElementById('createTitle').value = '';
+                        document.getElementById('createDescription').value = '';
+                        document.getElementById('createLocation').value = '';
+                        document.getElementById('createMaxPeople').value = '';
+                        loadActivitiesForManage();
+                    } else {
+                        showAlert(data.message || '创建失败', 'error');
+                    }
+                })
+                .catch(err => showAlert(err.message, 'error'));
+        }
+
+        function showEditActivityModal(activityId) {
+            editingActivityId = activityId;
+            const modal = document.getElementById('editActivityModal');
+            
+            // 从活动列表中找到该活动的数据
+            fetch(`${API_BASE}/activities`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && Array.isArray(data.data)) {
+                        const activity = data.data.find(a => a.activity_id === activityId);
+                        if (activity) {
+                            // 填充表单
+                            document.getElementById('editTitle').value = activity.title;
+                            document.getElementById('editDescription').value = activity.description || '';
+                            document.getElementById('editDept').value = activity.dept_id;
+                            document.getElementById('editCategory').value = activity.category_id;
+                            document.getElementById('editLocation').value = activity.location;
+                            document.getElementById('editMaxPeople').value = activity.max_people;
+                            
+                            // 转换时间格式
+                            const actTime = new Date(activity.activity_time);
+                            const localStr = actTime.toISOString().slice(0, 16);
+                            document.getElementById('editTime').value = localStr;
+                            
+                            // 显示模态框
+                            modal.classList.add('show');
+                        } else {
+                            showAlert('活动不存在', 'error');
+                        }
+                    }
+                })
+                .catch(err => showAlert(err.message, 'error'));
+        }
+
+        function closeEditModal() {
+            document.getElementById('editActivityModal').classList.remove('show');
+            editingActivityId = null;
+        }
+
+        function submitEditActivity() {
+            if (!editingActivityId) {
+                showAlert('活动ID丢失', 'error');
+                return;
+            }
+
+            const title = document.getElementById('editTitle').value.trim();
+            const description = document.getElementById('editDescription').value.trim();
+            const deptId = parseInt(document.getElementById('editDept').value || '0', 10);
+            const categoryId = parseInt(document.getElementById('editCategory').value || '0', 10);
+            const activityTime = document.getElementById('editTime').value;
+            const location = document.getElementById('editLocation').value.trim();
+            const maxPeople = parseInt(document.getElementById('editMaxPeople').value || '0', 10);
+
+            if (!title || !location || !activityTime || !maxPeople) {
+                showAlert('请填写完整的活动信息', 'error');
+                return;
+            }
+
+            fetch(`${API_BASE}/activities/${editingActivityId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dept_id: deptId,
+                    category_id: categoryId,
+                    creator_id: currentUser.user_id,
+                    title,
+                    description,
+                    activity_time: activityTime,
+                    location,
+                    max_people: maxPeople
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('活动已更新', 'success');
+                        closeEditModal();
+                        loadActivitiesForManage();
+                    } else {
+                        showAlert(data.message || '更新失败', 'error');
+                    }
+                })
+                .catch(err => showAlert(err.message, 'error'));
+        }
+
+        function deleteActivity(activityId) {
+            if (!confirm('确定要删除此活动吗？')) return;
+
+            fetch(`${API_BASE}/activities/${activityId}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('活动已删除', 'success');
+                        loadActivitiesForManage();
+                    } else {
+                        showAlert(data.message || '删除失败', 'error');
+                    }
+                })
+                .catch(err => showAlert(err.message, 'error'));
+        }
+
+        function loadActivitySelect() {
+            fetch(`${API_BASE}/activities`)
+                .then(res => res.json())
+                .then(data => {
+                    const select = document.getElementById('selectActivityForReview');
+                    select.innerHTML = '<option value="">选择活动...</option>';
+                    if (data.success && Array.isArray(data.data)) {
+                        data.data.forEach(activity => {
+                            const option = document.createElement('option');
+                            option.value = activity.activity_id;
+                            option.textContent = activity.title;
+                            select.appendChild(option);
+                        });
+                    }
+                });
+        }
+
+        function loadActivityApplications() {
+            const activityId = document.getElementById('selectActivityForReview').value;
+            if (!activityId) {
+                document.getElementById('applicationsReviewContainer').innerHTML = '';
+                return;
+            }
+
+            fetch(`${API_BASE}/activities/${activityId}/applications`)
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('applicationsReviewContainer');
+                    if (data.success && Array.isArray(data.data)) {
+                        renderApplicationsForReview(data.data, container);
+                    } else {
+                        container.innerHTML = '<div class="empty-state">暂无报名</div>';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('applicationsReviewContainer').innerHTML = '<div class="empty-state">加载失败</div>';
+                });
+        }
+
+        function renderApplicationsForReview(applications, container) {
+            if (!applications.length) {
+                container.innerHTML = '<div class="empty-state">暂无报名</div>';
+                return;
+            }
+
+            let html = '<table class="table"><thead><tr>';
+            html += '<th>用户名</th><th>申请时间</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+
+            applications.forEach(app => {
+                const applyTime = new Date(app.apply_time).toLocaleString('zh-CN');
+                const statusText = {
+                    'pending': '待审批',
+                    'approved': '已批准',
+                    'rejected': '已拒绝'
+                }[app.current_status] || app.current_status;
+
+                html += `<tr>
+                    <td>${app.username}</td>
+                    <td>${applyTime}</td>
+                    <td>${statusText}</td>
+                    <td>
+                        ${app.current_status === 'pending' ? `
+                            <button class="btn btn-success" onclick="reviewApplication(${app.application_id}, 'approved')" style="padding: 4px 8px;">批准</button>
+                            <button class="btn btn-danger" onclick="reviewApplication(${app.application_id}, 'rejected')" style="padding: 4px 8px;">拒绝</button>
+                        ` : '已审批'}
+                    </td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function reviewApplication(applicationId, status) {
+            fetch(`${API_BASE}/applications/${applicationId}/status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    status, 
+                    handler_id: currentUser.user_id 
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert(status === 'approved' ? '已批准' : '已拒绝', 'success');
+                        const activityId = document.getElementById('selectActivityForReview').value;
+                        if (activityId) loadActivityApplications();
+                    } else {
+                        showAlert(data.message || '操作失败', 'error');
+                    }
+                })
+                .catch(err => showAlert(err.message, 'error'));
+        }
+
+        // Activity Detail Functions
+        function showActivityDetail(activityId) {
+            detailingActivityId = activityId;
+            fetch(`${API_BASE}/activities/${activityId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        const activity = data.data;
+                        const actTime = new Date(activity.activity_time).toLocaleString('zh-CN');
+                        
+                        document.getElementById('detailActivityTitle').textContent = activity.title;
+                        document.getElementById('detailLocation').textContent = activity.location;
+                        document.getElementById('detailTime').textContent = actTime;
+                        document.getElementById('detailMaxPeople').textContent = activity.max_people;
+                        document.getElementById('detailDept').textContent = `部门 ${activity.dept_id}`;
+                        document.getElementById('detailDescription').textContent = activity.description || '暂无描述';
+                        
+                        document.getElementById('activityDetailModal').classList.add('show');
+                    } else {
+                        showAlert('获取活动详情失败', 'error');
+                    }
+                })
+                .catch(err => showAlert(err.message, 'error'));
+        }
+
+        function closeDetailModal() {
+            document.getElementById('activityDetailModal').classList.remove('show');
+            detailingActivityId = null;
+        }
+
+        function applyFromDetail() {
+            if (!currentUser || !currentUser.user_id) {
+                showAlert('用户信息获取失败', 'error');
+                return;
+            }
+            
+            if (!detailingActivityId) {
+                showAlert('活动ID丢失', 'error');
+                return;
+            }
+
+            fetch(`${API_BASE}/activities/${detailingActivityId}/apply`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: currentUser.user_id })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('报名成功！', 'success');
+                        closeDetailModal();
+                        loadMyApplications();
+                        loadActivities();
+                    } else {
+                        showAlert(data.message || '报名失败', 'error');
+                    }
+                })
+                .catch(err => showAlert(err.message, 'error'));
+        }
+
+        // Cancel Application Functions
+        function cancelApplicationConfirm(applicationId) {
+            if (!confirm('确定要取消报名吗？')) return;
+            cancelApplication(applicationId);
+        }
+
+        function cancelApplication(applicationId) {
+            fetch(`${API_BASE}/applications/${applicationId}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('取消报名成功', 'success');
+                        loadMyApplications();
+                    } else {
+                        showAlert(data.message || '取消报名失败', 'error');
+                    }
+                })
+                .catch(err => showAlert(err.message, 'error'));
+        }
+
+        // Statistics Functions
+        function openStatisticsModal() {
+            const modal = document.getElementById('statisticsModal');
+            modal.classList.add('show');
+            
+            fetch(`${API_BASE}/statistics`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        const stats = data.data;
+                        document.getElementById('statTotalActivities').textContent = stats.total_activities || 0;
+                        document.getElementById('statActiveActivities').textContent = stats.active_activities || 0;
+                        document.getElementById('statTotalUsers').textContent = stats.total_users || 0;
+                        document.getElementById('statTotalApplications').textContent = stats.total_applications || 0;
+                        document.getElementById('statApprovedApplications').textContent = stats.approved_applications || 0;
+                        document.getElementById('statPendingApplications').textContent = stats.pending_applications || 0;
+                        document.getElementById('statRejectedApplications').textContent = stats.rejected_applications || 0;
+                        document.getElementById('statExpiredActivities').textContent = stats.expired_activities || 0;
+                    }
+                })
+                .catch(err => showAlert(err.message, 'error'));
+        }
+
+        function closeStatisticsModal() {
+            document.getElementById('statisticsModal').classList.remove('show');
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', initPage);
+    </script>
+</body>
+</html>

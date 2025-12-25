@@ -99,6 +99,42 @@ CREATE TABLE ApplicationStatusLog
 );
 
 /*==============================================================*/
+/* Table: MessageBoard                                        */
+/*==============================================================*/
+CREATE TABLE MessageBoard
+(
+   message_id   INT NOT NULL AUTO_INCREMENT,
+   nickname     VARCHAR(50) NOT NULL,
+   content      TEXT NOT NULL,
+   created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   PRIMARY KEY (message_id)
+);
+
+/*==============================================================*/
+/* Table: Announcement                                        */
+/*==============================================================*/
+CREATE TABLE Announcement
+(
+   announcement_id INT NOT NULL AUTO_INCREMENT,
+   title          VARCHAR(200) NOT NULL,
+   content        TEXT NOT NULL,
+   publish_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   PRIMARY KEY (announcement_id)
+);
+
+/*==============================================================*/
+/* Table: FAQ                                                     */
+/*==============================================================*/
+CREATE TABLE FAQ
+(
+   faq_id        INT NOT NULL AUTO_INCREMENT,
+   question      VARCHAR(500) NOT NULL,
+   answer        TEXT NOT NULL,
+   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   PRIMARY KEY (faq_id)
+);
+
+/*==============================================================*/
 /* Foreign Key Constraints                                      */
 /*==============================================================*/
 

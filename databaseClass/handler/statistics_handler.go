@@ -160,3 +160,37 @@ func GetOmnipotentVolunteers(c *gin.Context) {
 		"data":    volunteers,
 	})
 }
+
+// GetUserApplicationInfo 获取所有用户及其报名情况（外连接）
+func GetUserApplicationInfo(c *gin.Context) {
+	info, err := service.GetUserApplicationInfo()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    info,
+	})
+}
+
+// GetDeptActivityInfo 获取所有部门及其活动数（外连接）
+func GetDeptActivityInfo(c *gin.Context) {
+	info, err := service.GetDeptActivityInfo()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    info,
+	})
+}

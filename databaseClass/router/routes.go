@@ -72,4 +72,6 @@ func SetupRoutes(r *gin.Engine) {
 	r.GET("/statistics/activities/popularity", handler.GetActivityPopularity)
 	r.GET("/statistics/admins", handler.GetAdminCreationStatistics)
 	r.GET("/statistics/omnipotent-volunteers", handler.GetOmnipotentVolunteers)
+	r.GET("/statistics/users-applications", handler.GetUserApplicationInfo)
+	r.GET("/statistics/depts-activities", handler.GetDeptActivityInfo)
 }

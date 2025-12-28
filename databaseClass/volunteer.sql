@@ -2,7 +2,7 @@
 /* DBMS name:      MySQL 5.0                                    */
 /* Created on:     2025/12/4 18:22:23                           */
 /*==============================================================*/
-create database volunteer;
+-- create database volunteer;
 use volunteer;
 DROP TABLE IF EXISTS ApplicationStatusLog;
 DROP TABLE IF EXISTS Application;

@@ -326,6 +326,59 @@ func GetPopularActivities() ([]PopularActivity, error) {
 	return results, nil
 }
 
+// UserApplicationInfo 用户及其报名情况（外连接）
+type UserApplicationInfo struct {
+	UserID        int     `json:"user_id"`
+	Username      string  `json:"username"`
+	ActivityID    *int    `json:"activity_id"`
+	ActivityTitle *string `json:"activity_title"`
+	ApplyTime     *string `json:"apply_time"`
+}
+
+// GetUserApplicationInfo 获取所有用户及其报名情况（外连接：LEFT JOIN）
+func GetUserApplicationInfo() ([]UserApplicationInfo, error) {
+	var results []UserApplicationInfo
+
+	err := config.DB.Raw(`
+		SELECT u.user_id, u.username, a.activity_id, a.title as activity_title,
+			DATE_FORMAT(ap.apply_time, '%Y-%m-%d %H:%i') as apply_time
+		FROM User u
+		LEFT JOIN Application ap ON u.user_id = ap.user_id
+		LEFT JOIN Activity a ON ap.activity_id = a.activity_id
+	`).Scan(&results).Error
+
+	if err != nil {
+		return nil, errors.New("查询用户报名情况失败")
+	}
+
+	return results, nil
+}
+
+// DeptActivityInfo 部门及其活动信息（外连接）
+type DeptActivityInfo struct {
+	DeptID        int    `json:"dept_id"`
+	DeptName      string `json:"dept_name"`
+	ActivityCount int    `json:"activity_count"`
+}
+
+// GetDeptActivityInfo 获取所有部门及其活动数（外连接：LEFT JOIN）
+func GetDeptActivityInfo() ([]DeptActivityInfo, error) {
+	var results []DeptActivityInfo
+
+	err := config.DB.Raw(`
+		SELECT d.dept_id, d.dept_name, COUNT(a.activity_id) as activity_count
+		FROM Dept d
+		LEFT JOIN Activity a ON d.dept_id = a.dept_id
+		GROUP BY d.dept_id, d.dept_name
+	`).Scan(&results).Error
+
+	if err != nil {
+		return nil, errors.New("查询部门活动统计失败")
+	}
+
+	return results, nil
+}
+
 // OmnipotentVolunteer 全能志愿者（参加了所有分类活动）
 type OmnipotentVolunteer struct {
 	UserID                 int    `json:"user_id"`
